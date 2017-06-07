@@ -1,0 +1,31 @@
+Instancia: GE_L3-9.txt
+Número de tarefas: 10
+Número de ferramentas: 10
+Tamanho da caixa de ferramentas: 6
+Matriz de entrada:6
+1 0 0 0 1 0 1 0 1 0 
+1 0 1 0 0 0 0 1 0 0 
+0 0 1 1 1 0 0 1 0 0 
+0 1 0 0 1 1 0 0 0 0 
+0 0 0 0 0 0 0 1 1 1 
+0 1 0 1 0 0 1 0 0 1 
+0 0 1 0 0 1 0 0 0 0 
+1 0 0 0 0 0 0 0 0 0 
+0 1 0 0 0 1 1 1 0 1 
+0 0 1 0 1 0 0 0 1 0 
+Run:2
+Tempo decorrido:2.47223
+Melhor valor encontrado para as trocas:15
+Configuração da ordem das tarefas a serem executadas:
+4 6 2 10 1 7 8 3 5 9 
+Configuração da matriz final:
+0 0 0 0 1 1 0 0 1 1 
+0 0 0 0 1 0 1 1 0 0 
+1 0 0 0 0 0 1 1 1 0 
+0 1 1 0 0 0 0 0 1 0 
+0 0 0 1 0 0 1 0 0 1 
+1 0 1 1 0 1 0 0 0 0 
+0 1 0 0 0 0 0 1 0 0 
+0 0 0 0 1 0 0 0 0 0 
+0 1 1 1 0 1 1 0 0 0 
+0 0 0 0 0 0 0 1 1 1 

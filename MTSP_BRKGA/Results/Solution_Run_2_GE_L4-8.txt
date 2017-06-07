@@ -1,0 +1,31 @@
+Instancia: GE_L4-8.txt
+Número de tarefas: 10
+Número de ferramentas: 10
+Tamanho da caixa de ferramentas: 7
+Matriz de entrada:7
+0 0 1 1 0 0 0 1 0 0 
+0 0 0 0 0 1 1 1 0 1 
+1 0 0 0 0 0 0 1 0 1 
+1 0 1 0 0 0 1 0 1 0 
+0 0 0 0 0 0 0 0 0 1 
+0 0 1 1 0 0 1 1 0 0 
+0 0 0 1 0 0 0 0 0 0 
+0 1 0 0 0 1 0 0 0 0 
+0 0 0 0 1 0 0 0 0 0 
+0 1 0 0 1 0 0 0 1 0 
+Run:2
+Tempo decorrido:1.90638
+Melhor valor encontrado para as trocas:11
+Configuração da ordem das tarefas a serem executadas:
+6 4 5 2 8 9 1 7 3 10 
+Configuração da matriz final:
+0 1 0 0 1 0 0 0 1 0 
+1 0 0 0 1 0 0 1 0 1 
+0 0 0 0 1 0 1 0 0 1 
+0 0 0 0 0 1 1 1 1 0 
+0 0 0 0 0 0 0 0 0 1 
+0 1 0 0 1 0 0 1 1 0 
+0 1 0 0 0 0 0 0 0 0 
+1 0 0 1 0 0 0 0 0 0 
+0 0 1 0 0 0 0 0 0 0 
+0 0 1 1 0 1 0 0 0 0 
