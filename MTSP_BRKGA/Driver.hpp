@@ -33,16 +33,16 @@ int numberOfTasks = 1; // Colunas
 
 int FinalSolutionValue = INT_MAX;
 
-unsigned K = 1;										// number of independent populations
-unsigned MAXT = 4;									// number of threads for parallel decoding
-unsigned X_INTVL = 100;								// exchange best individuals at every 100 generations
-unsigned X_NUMBER = 2;								// exchange top 2 best
-unsigned MAX_GENS = 100;							// run for 1000 gens
-unsigned n = 10;										// size of chromosomes
-unsigned p = 100;									// size of population
-double pe = 0.20;									// fraction of population to be the elite-set
-double pm = 0.10;									// fraction of population to be replaced by mutants
-double rhoe = 0.70;									// probability that offspring inherit an allele from elite parent
+unsigned K = 1;                   // number of independent populations
+unsigned MAXT = 4;                  // number of threads for parallel decoding
+unsigned X_INTVL = 100;               // exchange best individuals at every 100 generations
+unsigned X_NUMBER = 2;                // exchange top 2 best
+unsigned MAX_GENS = 100;              // run for 1000 gens
+unsigned n = 10;                    // size of chromosomes
+unsigned p = 100;                 // size of population
+double pe = 0.20;                 // fraction of population to be the elite-set
+double pm = 0.10;                 // fraction of population to be replaced by mutants
+double rhoe = 0.70;                 // probability that offspring inherit an allele from elite parent
 
 vector <Subconjunto> Subconjuntos;
 
@@ -58,7 +58,7 @@ const int localSeach = 1;
  Quando rodar o IRACE utilizar uma seed FIXA
 */
 
-//const long unsigned rngSeed = 2305843009213693951;	// seed to the random number generator
+//const long unsigned rngSeed = 2305843009213693951;  // seed to the random number generator
 
 const long unsigned rngSeed = rand();
 
@@ -131,99 +131,58 @@ void readProblem(string fileName)
 }
 
 /*
- Generate Pairs of Combinations
+  Pairs of Combinations
 */
 
-void Combinacao(int N, int K){
+void generatePairs(int N, int K){
+
   string bitmask(K, 1); // K leading 1's
   bitmask.resize(N, 0); // N-K trailing 0's
 
-Subconjunto sub;
-vector<int> auxiliar;
-// print integers and permute bitmask
-do {
-for (int i = 0; i < N; ++i) // [0..N-1] integers
-{
-if (bitmask[i]){
-auxiliar.push_back(i);
-}
-}
-sub.primeiraColuna = auxiliar[0];
-sub.segundaColuna = auxiliar[1];
-auxiliar.clear();
-Subconjuntos.push_back(sub);
-} while (std::prev_permutation(bitmask.begin(), bitmask.end()));
-bitmask.clear();
-}
+  Subconjunto sub;
+  vector<int> auxiliar;
 
-void imprimeSubconjuntos(){
-cout<< "Subconjuntos"<<endl;
-for(int i = 0; i< Subconjuntos.size(); i++){
-cout<< Subconjuntos[i].primeiraColuna<< ' '<<Subconjuntos[i].segundaColuna<<endl;
-}
+  do {
+    for (int i = 0; i < N; ++i){ // [0..N-1] integers
+      if (bitmask[i]){
+        auxiliar.push_back(i);
+      }
+    }
+
+    sub.primeiraColuna = auxiliar[0];
+    sub.segundaColuna = auxiliar[1];
+    auxiliar.clear();
+
+    Subconjuntos.push_back(sub);
+
+  } while (std::prev_permutation(bitmask.begin(), bitmask.end()));
+
+  bitmask.clear();
+
 }
 
-// Troca por intervalos
-void dois_opt(){
+vector<int> sufflePairs(){
 
-unsigned seed = std::chrono::system_clock::now().time_since_epoch().count(); // seed para evitar repetidos
-vector<int> elementos;
-int quantidade = Subconjuntos.size();
-
-for (int i = 0; i <quantidade; i++){
-elementos.push_back(i);
-} 
-
-shuffle (elementos.begin(), elementos.end(), std::default_random_engine(seed));
-// SWAPLOCAL parametro
-//int nTimes = round(quantidade * SWAP_LOCAL);
-
-// fitness
-int value = evaluationvalue[1];
-
-for(int i = 0; i <10; i++){
-vector<int>::iterator it = permutation.begin();
-Subconjunto sub = Subconjuntos[elementos[i]];
-reverse(it +(sub.primeiraColuna +1), it +(sub.segundaColuna+1));
-
-// KTNS
-consecutives();
-
-// verifica ftiness
-if (value <= evaluationvalue[1]){ // Piora de solucao, desfaz troca
-reverse(it +(sub.primeiraColuna +1), it +(sub.segundaColuna+1));
-evaluationvalue[1] = value;
-
-} else {
-value = evaluationvalue[1];                          
-i = 0;
-shuffle(elementos.begin(), elementos.end(), std::default_random_engine(seed));
-}
-}   
-elementos.clear();
-}
-
-// Troca 2
-void Pertubacao(){
-  // seed para evitar repetidos
-  unsigned seed = std::chrono::system_clock::now().time_since_epoch().count(); 
+  unsigned seed = std::chrono::system_clock::now().time_since_epoch().count(); // seed para evitar repetidos
   vector<int> elementos;
   int quantidade = Subconjuntos.size();
+
   for (int i = 0; i <quantidade; i++){
     elementos.push_back(i);
   } 
+
   shuffle (elementos.begin(), elementos.end(), std::default_random_engine(seed));
-   // quantas vezes serão executadas
-  int nTimes = round(quantidade * SWAP_PERTUBATION);                        
-  for(int i = 0; i < nTimes; i++){
-    Subconjunto sub = Subconjuntos[elementos[i]];
-    if (sub.primeiraColuna != -1 && sub.segundaColuna != -1){
-      swap(permutation[sub.primeiraColuna], permutation[sub.segundaColuna]);
-    }
+
+  return elementos;
+}
+
+void imprimeSubconjuntos(){
+
+  cout<< "Subconjuntos"<<endl;
+
+  for(int i = 0; i< Subconjuntos.size(); i++){
+    cout<< Subconjuntos[i].primeiraColuna<< ' '<<Subconjuntos[i].segundaColuna<<endl;
   }
-  // KTNS 
-  consecutives(); 
-  elementos.clear();  
 }
 
 /*
@@ -238,59 +197,113 @@ int detaEvaluation(){
  Busca Local  - Troca 2 opt
 */
 
-void localSearch2Opt(int firstFitness,std::vector<int> chromossome){
-  
-  unsigned int index = 0;
-  unsigned int size = int(chromossome.size());
-  
-  uint posA = 0;
-  uint posB = 0;
-  
-  while (index < size) {
-    
-    
-  }
-  
+double localSearch2Opt(int firstFitness,std::vector<int> chromossome){
+
+  vector<int> elementos = sufflePairs();
+
+  // SWAPLOCAL parametro
+  int nTimes = round(quantidade * SWAP_LOCAL);
+
+  // fitness
+  int currentFitness = firstFitness;
+
+  for(int i = 0; i < nTimes; i++){
+
+    vector<int>::iterator it = chromossome.begin();
+
+    Subconjunto sub = Subconjuntos[elementos[i]];
+
+    reverse(it +(sub.primeiraColuna +1), it +(sub.segundaColuna+1));
+
+    // KTNS
+
+    int lsFitness = ktns(permutation);
+
+    // verifica ftiness
+    if (lsFitness <= currentFitness){ // Caso ocorra piora de solucao, desfaz troca
+      reverse(it +(sub.primeiraColuna +1), it +(sub.segundaColuna+1));
+    } else { // Melhora de soluca
+      currentFitness = lsFitness;                          
+      i = 0;
+      shuffle(elementos.begin(), elementos.end(), std::default_random_engine(seed));
+    }
+  }   
+
+  return myFitness;
 }
 
 /*
  Busca Local  - Troca 2 swap
 */
 
-void localSearch2Swap(){
+double localSearch2Swap(int firstFitness,std::vector<int> chromossome){
 
+  vector<int> elementos = sufflePairs();
+  int currentFitness = firstFitness;
+
+  // quantas vezes serão executadas
+  int nTimes = 10;    
+
+  for(int i = 0; i < nTimes; i++){
+
+    Subconjunto sub = Subconjuntos[elementos[i]];
+
+    if (sub.primeiraColuna != -1 && sub.segundaColuna != -1){
+      
+      swap(chromossome[sub.primeiraColuna], chromossome[sub.segundaColuna]);
+      
+      int lsFitness = ktns(permutation);
+
+      // verifica ftiness
+      if (lsFitness <= currentFitness){ // Caso ocorra piora de solucao, desfaz troca
+        swap(chromossome[sub.segundaColuna], chromossome[sub.primeiraColuna]);
+      } else { // Melhora de soluca
+        currentFitness = lsFitness;                          
+        i = 0;
+        shuffle(elementos.begin(), elementos.end(), std::default_random_engine(seed));
+      }
+    }
+  }
+
+  elementos.clear(); 
+
+  return myFitness;
 }
 
 /*
  Refaz vetor solucao
 */
 
-
 /*
  Metodo para refinar decodificacao
 */
 
-int refineDecodeSolution(std::vector<int> firstPermutation, int firstFitness){
+double refineDecodeSolution(std::vector<int> firstPermutation, double firstFitness){
   
+  double currentFitness = 0.0;
+  uint size = firstPermutation.size();
+
+  generatePairs(size,2);
   
   // Escolhe qual busca local aplicar
   switch (localSeach) {
       
     case 1:
-      localSearch2Opt(firstFitness,firstPermutation);
+      currentFitness = localSearch2Opt(firstFitness,firstPermutation);
       break;
       
     case 2:
-      localSearch2Opt(firstFitness,firstPermutation);
+      currentFitness = localSearch2Swap(firstFitness,firstPermutation);
       break;
       
     default:
-      localSearch2Opt(firstFitness,firstPermutation);
+      currentFitness = localSearch2Opt(firstFitness,firstPermutation);
+      currentFitness = localSearch2Swap(firstFitness,currentFitness);
       break;
   }
   
   
-  return 0;
+  return currentFitness;
 }
 
 /*
@@ -459,9 +472,9 @@ void printToolsVet(std::vector<int> vet){
 
 void setUpBRKGA(){
   
-  const long unsigned rngSeed = 0;	// seed to the random number generator
+  const long unsigned rngSeed = 0;  // seed to the random number generator
   
-  MTRand rng(rngSeed);				// initialize the random number generator
+  MTRand rng(rngSeed);        // initialize the random number generator
   
   Decoder decode;
   
@@ -478,13 +491,13 @@ void setUpBRKGA(){
                                      K,
                                      MAXT);
   
-  unsigned generation = 0;		// current generation
+  unsigned generation = 0;    // current generation
   
   do {
-    algorithm.evolve();	// evolve the population for one generation
+    algorithm.evolve(); // evolve the population for one generation
     
     if((++generation) % X_INTVL == 0) {
-      algorithm.exchangeElite(X_NUMBER);	// exchange top individuals
+      algorithm.exchangeElite(X_NUMBER);  // exchange top individuals
     }
   } while (generation < MAX_GENS);
   
@@ -526,7 +539,7 @@ void printSolution(string inputFileName, int solutionValue, double time, int run
 {
   string outputFileName =  "Results/Solution_Run_" + to_string(run) +"_" +  inputFileName ;
   
-  ofstream fpSolution(outputFileName);				//file that contains the information about the solution of a problem instance
+  ofstream fpSolution(outputFileName);        //file that contains the information about the solution of a problem instance
   
   fpSolution << "Instancia: " << inputFileName << std::endl;
   
