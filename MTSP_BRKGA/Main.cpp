@@ -5,9 +5,11 @@
 
 using namespace std;
 
-#include "Driver.hpp"							//includes the heuristic
-
-#define RUNS 1							//how many runs for each instance?
+//includes the heuristic
+#include "Driver.hpp"
+							
+//how many runs for each instance?
+#define RUNS 1							
 
 int main()
 {

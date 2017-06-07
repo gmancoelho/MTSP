@@ -44,12 +44,15 @@ double pe = 0.20;                 // fraction of population to be the elite-set
 double pm = 0.10;                 // fraction of population to be replaced by mutants
 double rhoe = 0.70;                 // probability that offspring inherit an allele from elite parent
 
-vector <Subconjunto> Subconjuntos;
 
-struct Subconjunto{  // struct para salvar as 2 posições para o swap
+// struct para salvar as 2 posições para o swap
+
+struct Subconjunto{  
     int primeiraColuna;
     int segundaColuna;
 };
+
+vector <Subconjunto> Subconjuntos;
 
 // 1 - 2OPT // 2 - 2SWAP
 const int localSeach = 1;
@@ -197,12 +200,12 @@ int detaEvaluation(){
  Busca Local  - Troca 2 opt
 */
 
-double localSearch2Opt(int firstFitness,std::vector<int> chromossome){
+double localSearch2Opt(double firstFitness,std::vector<int> chromossome){
 
   vector<int> elementos = sufflePairs();
 
   // SWAPLOCAL parametro
-  int nTimes = round(quantidade * SWAP_LOCAL);
+  int nTimes = 10;
 
   // fitness
   int currentFitness = firstFitness;
@@ -217,7 +220,7 @@ double localSearch2Opt(int firstFitness,std::vector<int> chromossome){
 
     // KTNS
 
-    int lsFitness = ktns(permutation);
+    int lsFitness = ktns(chromossome);
 
     // verifica ftiness
     if (lsFitness <= currentFitness){ // Caso ocorra piora de solucao, desfaz troca
@@ -225,18 +228,18 @@ double localSearch2Opt(int firstFitness,std::vector<int> chromossome){
     } else { // Melhora de soluca
       currentFitness = lsFitness;                          
       i = 0;
-      shuffle(elementos.begin(), elementos.end(), std::default_random_engine(seed));
+      elementos = sufflePairs();
     }
   }   
 
-  return myFitness;
+  return currentFitness;
 }
 
 /*
  Busca Local  - Troca 2 swap
 */
 
-double localSearch2Swap(int firstFitness,std::vector<int> chromossome){
+double localSearch2Swap(double firstFitness,std::vector<int> chromossome){
 
   vector<int> elementos = sufflePairs();
   int currentFitness = firstFitness;
@@ -252,7 +255,7 @@ double localSearch2Swap(int firstFitness,std::vector<int> chromossome){
       
       swap(chromossome[sub.primeiraColuna], chromossome[sub.segundaColuna]);
       
-      int lsFitness = ktns(permutation);
+      int lsFitness = ktns(chromossome);
 
       // verifica ftiness
       if (lsFitness <= currentFitness){ // Caso ocorra piora de solucao, desfaz troca
@@ -260,14 +263,14 @@ double localSearch2Swap(int firstFitness,std::vector<int> chromossome){
       } else { // Melhora de soluca
         currentFitness = lsFitness;                          
         i = 0;
-        shuffle(elementos.begin(), elementos.end(), std::default_random_engine(seed));
+        elementos = sufflePairs();
       }
     }
   }
 
   elementos.clear(); 
 
-  return myFitness;
+  return currentFitness;
 }
 
 /*
@@ -298,7 +301,7 @@ double refineDecodeSolution(std::vector<int> firstPermutation, double firstFitne
       
     default:
       currentFitness = localSearch2Opt(firstFitness,firstPermutation);
-      currentFitness = localSearch2Swap(firstFitness,currentFitness);
+      currentFitness = localSearch2Swap(currentFitness,firstPermutation);
       break;
   }
   
@@ -526,7 +529,7 @@ void termination()
   numberOfTools = 0; // Linha
   numberOfTasks = 0; // Colunas
   bestSolVet.clear();
-  bestSolValue = NULL;
+  bestSolValue = 0;
   
   toolsPerTask.clear();
   
