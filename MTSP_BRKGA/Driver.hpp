@@ -44,6 +44,12 @@ double pe = 0.20;									// fraction of population to be the elite-set
 double pm = 0.10;									// fraction of population to be replaced by mutants
 double rhoe = 0.70;									// probability that offspring inherit an allele from elite parent
 
+vector <Subconjunto> Subconjuntos;
+
+struct Subconjunto{  // struct para salvar as 2 posições para o swap
+    int primeiraColuna;
+    int segundaColuna;
+};
 
 // 1 - 2OPT // 2 - 2SWAP
 const int localSeach = 1;
@@ -128,15 +134,96 @@ void readProblem(string fileName)
  Generate Pairs of Combinations
 */
 
-std::set< pair<int,int> > generatePairsOfCombinations(int treshold){
-  
-  std::set< pair<int,int> > combinations;
-  
-  do {
-    std::cout << myints[0] << ' ' << myints[1] << ' ' << myints[2] << '\n';
-  } while()
-  
-  return combinations;
+void Combinacao(int N, int K){
+  string bitmask(K, 1); // K leading 1's
+  bitmask.resize(N, 0); // N-K trailing 0's
+
+Subconjunto sub;
+vector<int> auxiliar;
+// print integers and permute bitmask
+do {
+for (int i = 0; i < N; ++i) // [0..N-1] integers
+{
+if (bitmask[i]){
+auxiliar.push_back(i);
+}
+}
+sub.primeiraColuna = auxiliar[0];
+sub.segundaColuna = auxiliar[1];
+auxiliar.clear();
+Subconjuntos.push_back(sub);
+} while (std::prev_permutation(bitmask.begin(), bitmask.end()));
+bitmask.clear();
+}
+
+void imprimeSubconjuntos(){
+cout<< "Subconjuntos"<<endl;
+for(int i = 0; i< Subconjuntos.size(); i++){
+cout<< Subconjuntos[i].primeiraColuna<< ' '<<Subconjuntos[i].segundaColuna<<endl;
+}
+}
+
+// Troca por intervalos
+void dois_opt(){
+
+unsigned seed = std::chrono::system_clock::now().time_since_epoch().count(); // seed para evitar repetidos
+vector<int> elementos;
+int quantidade = Subconjuntos.size();
+
+for (int i = 0; i <quantidade; i++){
+elementos.push_back(i);
+} 
+
+shuffle (elementos.begin(), elementos.end(), std::default_random_engine(seed));
+// SWAPLOCAL parametro
+//int nTimes = round(quantidade * SWAP_LOCAL);
+
+// fitness
+int value = evaluationvalue[1];
+
+for(int i = 0; i <10; i++){
+vector<int>::iterator it = permutation.begin();
+Subconjunto sub = Subconjuntos[elementos[i]];
+reverse(it +(sub.primeiraColuna +1), it +(sub.segundaColuna+1));
+
+// KTNS
+consecutives();
+
+// verifica ftiness
+if (value <= evaluationvalue[1]){ // Piora de solucao, desfaz troca
+reverse(it +(sub.primeiraColuna +1), it +(sub.segundaColuna+1));
+evaluationvalue[1] = value;
+
+} else {
+value = evaluationvalue[1];                          
+i = 0;
+shuffle(elementos.begin(), elementos.end(), std::default_random_engine(seed));
+}
+}   
+elementos.clear();
+}
+
+// Troca 2
+void Pertubacao(){
+  // seed para evitar repetidos
+  unsigned seed = std::chrono::system_clock::now().time_since_epoch().count(); 
+  vector<int> elementos;
+  int quantidade = Subconjuntos.size();
+  for (int i = 0; i <quantidade; i++){
+    elementos.push_back(i);
+  } 
+  shuffle (elementos.begin(), elementos.end(), std::default_random_engine(seed));
+   // quantas vezes serão executadas
+  int nTimes = round(quantidade * SWAP_PERTUBATION);                        
+  for(int i = 0; i < nTimes; i++){
+    Subconjunto sub = Subconjuntos[elementos[i]];
+    if (sub.primeiraColuna != -1 && sub.segundaColuna != -1){
+      swap(permutation[sub.primeiraColuna], permutation[sub.segundaColuna]);
+    }
+  }
+  // KTNS 
+  consecutives(); 
+  elementos.clear();  
 }
 
 /*
