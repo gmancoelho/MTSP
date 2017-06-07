@@ -9,12 +9,10 @@
 
 #include "brkgaAPI/BRKGA.h"
 #include "brkgaAPI/MTRand.h"
-//#include "Node.h"
 
 using namespace std;
 using namespace std::chrono;
 
-//typedef vector< Node > vNode;
 typedef signed char**  sCC;
 
 // Variávies Globais
@@ -22,8 +20,6 @@ typedef signed char**  sCC;
 double bestSolValue = 0;
 vector<int> bestSolVet;
 vector<set<int> > toolsPerTask;
-
-// Dados do Problema
 
 sCC Matrix_Graph; // Matriz de Chars - Mais rapido
 
@@ -53,6 +49,8 @@ struct Subconjunto{
 };
 
 vector <Subconjunto> Subconjuntos;
+vector<int> elementos;
+vector<int> permutationIndex;
 
 // 1 - 2OPT // 2 - 2SWAP
 const int localSeach = 1;
@@ -164,10 +162,12 @@ void generatePairs(int N, int K){
 
 }
 
-vector<int> sufflePairs(){
+// Criar vector global e alterar
+
+void sufflePairs(){
 
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count(); // seed para evitar repetidos
-  vector<int> elementos;
+  elementos.clear();
   int quantidade = Subconjuntos.size();
 
   for (int i = 0; i <quantidade; i++){
@@ -175,8 +175,6 @@ vector<int> sufflePairs(){
   } 
 
   shuffle (elementos.begin(), elementos.end(), std::default_random_engine(seed));
-
-  return elementos;
 }
 
 void imprimeSubconjuntos(){
@@ -192,7 +190,8 @@ void imprimeSubconjuntos(){
  Delta avaliacao
 */
 
-int detaEvaluation(){
+int deltaEvaluation(){
+
   return 0;
 }
 
@@ -202,7 +201,7 @@ int detaEvaluation(){
 
 double localSearch2Opt(double firstFitness,std::vector<int> chromossome){
 
-  vector<int> elementos = sufflePairs();
+  sufflePairs();
 
   // SWAPLOCAL parametro
   int nTimes = 10;
@@ -241,7 +240,7 @@ double localSearch2Opt(double firstFitness,std::vector<int> chromossome){
 
 double localSearch2Swap(double firstFitness,std::vector<int> chromossome){
 
-  vector<int> elementos = sufflePairs();
+  sufflePairs();
   int currentFitness = firstFitness;
 
   // quantas vezes serão executadas
@@ -277,6 +276,11 @@ double localSearch2Swap(double firstFitness,std::vector<int> chromossome){
  Refaz vetor solucao
 */
 
+void fixPermutation(){
+
+
+}
+
 /*
  Metodo para refinar decodificacao
 */
@@ -305,6 +309,7 @@ double refineDecodeSolution(std::vector<int> firstPermutation, double firstFitne
       break;
   }
   
+  fixPermutation();
   
   return currentFitness;
 }
@@ -327,6 +332,7 @@ std::vector<int> decodeChromosome(std::vector< double > chromosome){
   std::vector< int > permutation;
   for(std::vector< ValueKeyPair >::const_iterator i = rank.begin(); i != rank.end(); ++i) {
     permutation.push_back(i->second);
+    permutationIndex.push_back(i->first);
   }
   
   return permutation;
